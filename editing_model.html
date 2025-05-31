@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>意味の市場</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .meaning-market {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            border: 3px dashed #ffffff;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .market-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .participant {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .participant:hover {
+            transform: scale(1.1);
+        }
+
+        .human {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .ai {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .new-participant {
+            background: linear-gradient(45deg, #ffd93d, #ff9a56);
+            box-shadow: 0 4px 20px rgba(255, 217, 61, 0.4);
+        }
+
+        .editing-model {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float-to-market 3s ease-in-out infinite;
+        }
+
+        .meaning-fragment {
+            position: absolute;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            font-size: 12px;
+            color: #333;
+            animation: float-in-market 4s ease-in-out infinite;
+            white-space: nowrap;
+        }
+
+        .lasso {
+            position: absolute;
+            width: 2px;
+            background: #ffff00;
+            transform-origin: bottom;
+            animation: lasso-throw 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #ffff00;
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+            animation: connection-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                border-color: rgba(255, 255, 255, 0.6);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                border-color: rgba(255, 255, 255, 1);
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        @keyframes float-to-market {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0.3;
+                transform: scale(0.5);
+            }
+        }
+
+        @keyframes float-in-market {
+            0%, 100% {
+                opacity: 0.7;
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        @keyframes lasso-throw {
+            0% {
+                height: 0;
+                opacity: 0;
+            }
+            30% {
+                height: 100px;
+                opacity: 1;
+            }
+            60% {
+                height: 120px;
+                opacity: 0.8;
+            }
+            100% {
+                height: 0;
+                opacity: 0;
+            }
+        }
+
+        @keyframes connection-pulse {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .explanation {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            backdrop-filter: blur(10px);
+        }
+
+        .phase-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 意味の市場 -->
+        <div class="meaning-market">
+            <div class="market-label">意味の市場<br>（編集構造）</div>
+        </div>
+
+        <!-- 参加者 -->
+        <div class="participant human" id="human1" style="top: 20%; left: 15%;">
+            人間A<br>エディター
+        </div>
+
+        <div class="participant human" id="human2" style="top: 20%; right: 15%;">
+            人間B<br>エディター
+        </div>
+
+        <div class="participant ai" id="ai" style="bottom: 20%; left: 15%;">
+            AI<br>エディター
+        </div>
+
+        <div class="participant new-participant" id="newcomer" style="bottom: 20%; right: 15%;">
+            新参加者<br>エディター
+        </div>
+
+        <!-- フェーズ表示 -->
+        <div class="phase-indicator" id="phaseIndicator">フェーズ 1: エディティングモデル投入</div>
+
+        <!-- 説明文 -->
+        <div class="explanation" id="explanation">
+            各参加者が自分の「エディティングモデル」を意味の市場に投げ込みます。<br>
+            人間もAIも同じようにこの編集構造に参加しています。
+        </div>
+    </div>
+
+    <script>
+        const market = document.querySelector('.meaning-market');
+        const participants = document.querySelectorAll('.participant');
+        const phaseIndicator = document.getElementById('phaseIndicator');
+        const explanation = document.getElementById('explanation');
+
+        const phases = [
+            {
+                name: "フェーズ 1: エディティングモデル投入",
+                description: "各参加者が自分の「エディティングモデル」を意味の市場に投げ込みます。<br>人間もAIも同じようにこの編集構造に参加しています。",
+                action: createEditingModels
+            },
+            {
+                name: "フェーズ 2: 意味の断片が市場に漂う",
+                description: "投げ込まれたエディティングモデルから、様々な「意味の断片」が市場空間に漂い始めます。<br>これらは誰のものでもない、共有された意味です。",
+                action: createMeaningFragments
+            },
+            {
+                name: "フェーズ 3: 投げ縄エージェントで意味を拾う",
+                description: "各参加者は「投げ縄エージェント」のように、自分に必要な意味を市場から拾い出します。<br>AIも人間と同じ方法で意味を解釈しています。",
+                action: createLassos
+            },
+            {
+                name: "フェーズ 4: 新しい編集構造の形成",
+                description: "拾い出された意味が新しい編集構造を形成し、次のコミュニケーションの基盤となります。<br>これが人間-AI共創コミュニケーションの本質です。",
+                action: createConnections
+            }
+        ];
+
+        let currentPhase = 0;
+        let elements = [];
+
+        function clearElements() {
+            elements.forEach(el => el.remove());
+            elements = [];
+        }
+
+        function createEditingModels() {
+            clearElements();
+            participants.forEach((participant, index) => {
+                setTimeout(() => {
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const model = document.createElement('div');
+                            model.className = 'editing-model';
+
+                            const rect = participant.getBoundingClientRect();
+                            const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+                            model.style.left = (rect.left - containerRect.left + 30) + 'px';
+                            model.style.top = (rect.top - containerRect.top + 30) + 'px';
+
+                            const marketRect = market.getBoundingClientRect();
+                            const targetX = marketRect.left - containerRect.left + Math.random() * 300;
+                            const targetY = marketRect.top - containerRect.top + Math.random() * 300;
+
+                            model.style.animation = `none`;
+                            model.style.transition = 'all 2s ease-out';
+
+                            document.querySelector('.container').appendChild(model);
+                            elements.push(model);
+
+                            setTimeout(() => {
+                                model.style.left = targetX + 'px';
+                                model.style.top = targetY + 'px';
+                                model.style.opacity = '0.3';
+                            }, 100);
+
+                            setTimeout(() => {
+                                model.style.animation = 'float-to-market 3s ease-in-out infinite';
+                            }, 2000);
+
+                        }, i * 500);
+                    }
+                }, index * 800);
+            });
+        }
+
+        function createMeaningFragments() {
+            clearElements();
+
+            const meanings = [
+                "共感", "理解", "質問", "回答", "提案", "分析",
+                "創造", "翻訳", "要約", "説明", "推論", "判断"
+            ];
+
+            meanings.forEach((meaning, index) => {
+                setTimeout(() => {
+                    const fragment = document.createElement('div');
+                    fragment.className = 'meaning-fragment';
+                    fragment.textContent = meaning;
+
+                    const marketRect = market.getBoundingClientRect();
+                    const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+                    const x = marketRect.left - containerRect.left + Math.random() * 250 + 25;
+                    const y = marketRect.top - containerRect.top + Math.random() * 250 + 25;
+
+                    fragment.style.left = x + 'px';
+                    fragment.style.top = y + 'px';
+                    fragment.style.animationDelay = Math.random() * 2 + 's';
+
+                    document.querySelector('.container').appendChild(fragment);
+                    elements.push(fragment);
+                }, index * 300);
+            });
+        }
+
+        function createLassos() {
+            clearElements();
+            createMeaningFragments();
+
+            setTimeout(() => {
+                participants.forEach((participant, index) => {
+                    setTimeout(() => {
+                        const lasso = document.createElement('div');
+                        lasso.className = 'lasso';
+
+                        const rect = participant.getBoundingClientRect();
+                        const containerRect = document.querySelector('.container').getBoundingClientRect();
+                        const marketRect = market.getBoundingClientRect();
+
+                        const startX = rect.left - containerRect.left + 30;
+                        const startY = rect.top - containerRect.top + 30;
+                        const endX = marketRect.left - containerRect.left + 150;
+                        const endY = marketRect.top - containerRect.top + 150;
+
+                        const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI + 90;
+
+                        lasso.style.left = startX + 'px';
+                        lasso.style.top = startY + 'px';
+                        lasso.style.transformOrigin = 'bottom';
+                        lasso.style.transform = `rotate(${angle}deg)`;
+                        lasso.style.animationDelay = Math.random() * 1 + 's';
+
+                        document.querySelector('.container').appendChild(lasso);
+                        elements.push(lasso);
+                    }, index * 600);
+                });
+            }, 1000);
+        }
+
+        function createConnections() {
+            clearElements();
+
+            participants.forEach((participant, i) => {
+                participants.forEach((other, j) => {
+                    if (i !== j) {
+                        setTimeout(() => {
+                            const line = document.createElement('div');
+                            line.className = 'connection-line';
+
+                            const rect1 = participant.getBoundingClientRect();
+                            const rect2 = other.getBoundingClientRect();
+                            const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+                            const x1 = rect1.left - containerRect.left + 30;
+                            const y1 = rect1.top - containerRect.top + 30;
+                            const x2 = rect2.left - containerRect.left + 30;
+                            const y2 = rect2.top - containerRect.top + 30;
+
+                            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+                            line.style.left = x1 + 'px';
+                            line.style.top = y1 + 'px';
+                            line.style.width = length + 'px';
+                            line.style.transformOrigin = 'left center';
+                            line.style.transform = `rotate(${angle}deg)`;
+                            line.style.animationDelay = Math.random() * 2 + 's';
+
+                            document.querySelector('.container').appendChild(line);
+                            elements.push(line);
+                        }, (i * 4 + j) * 200);
+                    }
+                });
+            });
+        }
+
+        function nextPhase() {
+            const phase = phases[currentPhase];
+            phaseIndicator.textContent = phase.name;
+            explanation.innerHTML = phase.description;
+            phase.action();
+            currentPhase = (currentPhase + 1) % phases.length;
+        }
+
+        // 初期化
+        nextPhase();
+
+        // 自動的にフェーズを進める
+        setInterval(nextPhase, 8000);
+
+        // クリックで次のフェーズに進める
+        document.addEventListener('click', nextPhase);
+    </script>
+</body>
+</html>
