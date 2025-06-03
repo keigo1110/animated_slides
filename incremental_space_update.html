@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一人称視点による選択的環境再構成システム</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .demo-area {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .view-container {
+            flex: 1;
+            min-width: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .view-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        canvas {
+            width: 100%;
+            height: 300px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .explanation {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>一人称視点による選択的環境再構成システム</h1>
+
+        <div class="demo-area">
+            <div class="view-container">
+                <div class="view-title">🌍 実際の環境（撮影対象）</div>
+                <canvas id="globalCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="demo-area">
+            <div class="view-container" style="flex: 1;">
+                <div class="view-title">🗺️ デジタルツインマップ（逐次更新）</div>
+                <canvas id="digitalTwinCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="toggleAnimation()">アニメーション開始/停止</button>
+            <button onclick="resetView()">リセット</button>
+            <button onclick="moveRandomStaticObject()">静的オブジェクト移動</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background: #4CAF50;"></div>
+                <span>静的オブジェクト（観測済み）</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #555;"></div>
+                <span>空間（観測済み）</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #141414;"></div>
+                <span>未観測領域</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #FF5722;"></div>
+                <span>動的要素</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: rgba(255,255,0,0.3);"></div>
+                <span>現在の視野範囲</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background: #2196F3;"></div>
+                <span>カメラ位置</span>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <h3>システムの動作原理</h3>
+
+            <div class="step">
+                <strong class="highlight">1. 視野範囲限定更新</strong><br>
+                一人称視点の視野角内のピクセルのみを逐次更新し、視野外は過去の状態を保持
+            </div>
+
+            <div class="step">
+                <strong class="highlight">2. 完全上書き更新</strong><br>
+                新しい観測データで該当領域を完全に上書きし、累積ノイズを根本的に排除
+            </div>
+
+            <div class="step">
+                <strong class="highlight">3. 動的要素の分離表示</strong><br>
+                移動物体はデジタルツインに統合せず、リアルタイムオーバーレイとして表示
+            </div>
+
+            <div class="step">
+                <strong class="highlight">4. 一貫性のあるマップ構築</strong><br>
+                観測済み領域は常に最新状態を保ち、矛盾のない環境モデルを逐次構築
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas elements
+        const globalCanvas = document.getElementById('globalCanvas');
+        const digitalTwinCanvas = document.getElementById('digitalTwinCanvas');
+        const globalCtx = globalCanvas.getContext('2d');
+        const dtCtx = digitalTwinCanvas.getContext('2d');
+
+        // Set proper canvas dimensions
+        function resizeCanvases() {
+            globalCanvas.width = globalCanvas.offsetWidth;
+            globalCanvas.height = globalCanvas.offsetHeight;
+            digitalTwinCanvas.width = digitalTwinCanvas.offsetWidth;
+            digitalTwinCanvas.height = digitalTwinCanvas.offsetHeight;
+        }
+        resizeCanvases();
+        window.addEventListener('resize', resizeCanvases);
+
+        // Animation state
+        let isAnimating = false;
+        let animationId;
+        let time = 0;
+        let showDynamicObjects = true;
+
+        // Camera properties with dynamic movement
+        let cameraX = 300;
+        let cameraY = 200;
+        let cameraAngle = 0;
+        let cameraVelocityX = 0;
+        let cameraVelocityY = 0;
+        let cameraAngularVelocity = 0;
+        let lastDirectionChange = 0;
+        let explorationTarget = { x: 300, y: 200 };
+        let isReturning = false;
+        const viewAngle = Math.PI / 2.5; // 72 degrees field of view (wider)
+        const viewDistance = 180; // Longer range
+
+        // Digital Twin Map - stores the reconstructed environment
+        let digitalTwinMap = null;
+
+        function initializeDigitalTwin() {
+            if (!digitalTwinCanvas.width || !digitalTwinCanvas.height) return;
+
+            digitalTwinMap = {
+                width: digitalTwinCanvas.width,
+                height: digitalTwinCanvas.height,
+                data: new Uint8ClampedArray(digitalTwinCanvas.width * digitalTwinCanvas.height * 4),
+                observedMask: new Uint8Array(digitalTwinCanvas.width * digitalTwinCanvas.height)
+            };
+
+            // Initialize with dark unobserved color
+            for (let i = 0; i < digitalTwinMap.data.length; i += 4) {
+                digitalTwinMap.data[i] = 20;     // R - very dark
+                digitalTwinMap.data[i + 1] = 20; // G - very dark
+                digitalTwinMap.data[i + 2] = 20; // B - very dark
+                digitalTwinMap.data[i + 3] = 255; // A
+            }
+        }
+        // Environment objects
+        const staticObjects = [
+            {x: 150, y: 100, width: 40, height: 30, updated: false, age: 0},
+            {x: 350, y: 150, width: 50, height: 40, updated: false, age: 0},
+            {x: 200, y: 250, width: 60, height: 35, updated: false, age: 0},
+            {x: 450, y: 200, width: 45, height: 25, updated: false, age: 0},
+            {x: 100, y: 300, width: 35, height: 45, updated: false, age: 0},
+            {x: 400, y: 80, width: 30, height: 50, updated: false, age: 0},
+        ];
+
+        const dynamicObjects = [
+            {x: 250, y: 180, width: 20, height: 20, vx: 1, vy: 0.5, color: '#FF5722'},
+            {x: 180, y: 120, width: 15, height: 15, vx: -0.8, vy: 1.2, color: '#E91E63'},
+            {x: 380, y: 280, width: 18, height: 18, vx: 0.6, vy: -0.9, color: '#FF9800'},
+        ];
+
+        // Update Digital Twin Map based on current view
+        function updateDigitalTwin() {
+            if (!digitalTwinMap) return;
+
+            const centerX = cameraX;
+            const centerY = cameraY;
+            const angle = cameraAngle;
+            const distance = viewDistance;
+            const halfAngle = viewAngle / 2;
+
+            // Create a temporary canvas to render the current static environment
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = digitalTwinCanvas.width;
+            tempCanvas.height = digitalTwinCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Draw background with observed area color
+            tempCtx.fillStyle = '#555'; // Medium gray for observed but empty areas
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Draw static objects with bright green
+            tempCtx.fillStyle = '#4CAF50';
+            staticObjects.forEach(obj => {
+                tempCtx.fillRect(obj.x - obj.width/2, obj.y - obj.height/2, obj.width, obj.height);
+            });
+
+            // Get the image data
+            const currentFrame = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Update only the pixels within the field of view
+            const minY = Math.max(0, Math.floor(centerY - distance));
+            const maxY = Math.min(digitalTwinMap.height - 1, Math.ceil(centerY + distance));
+            const minX = Math.max(0, Math.floor(centerX - distance));
+            const maxX = Math.min(digitalTwinMap.width - 1, Math.ceil(centerX + distance));
+
+            for (let y = minY; y <= maxY; y++) {
+                for (let x = minX; x <= maxX; x++) {
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (pixelDistance <= distance) {
+                        const angleToPixel = Math.atan2(dy, dx);
+                        let angleDiff = angleToPixel - angle;
+
+                        // Normalize angle difference
+                        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+                        if (Math.abs(angleDiff) <= halfAngle) {
+                            const index = (y * digitalTwinMap.width + x) * 4;
+                            const frameIndex = (y * tempCanvas.width + x) * 4;
+
+                            // Bounds check for safety
+                            if (index >= 0 && index < digitalTwinMap.data.length - 3 &&
+                                frameIndex >= 0 && frameIndex < currentFrame.data.length - 3) {
+                                // Update digital twin with current observation
+                                digitalTwinMap.data[index] = currentFrame.data[frameIndex];         // R
+                                digitalTwinMap.data[index + 1] = currentFrame.data[frameIndex + 1]; // G
+                                digitalTwinMap.data[index + 2] = currentFrame.data[frameIndex + 2]; // B
+                                digitalTwinMap.data[index + 3] = 255; // A
+
+                                // Mark as observed
+                                const maskIndex = y * digitalTwinMap.width + x;
+                                if (maskIndex >= 0 && maskIndex < digitalTwinMap.observedMask.length) {
+                                    digitalTwinMap.observedMask[maskIndex] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function drawDigitalTwin() {
+            if (!digitalTwinMap) return;
+
+            // Clear canvas first
+            dtCtx.clearRect(0, 0, digitalTwinCanvas.width, digitalTwinCanvas.height);
+
+            // Create image data from digital twin map
+            const imageData = new ImageData(digitalTwinMap.data, digitalTwinMap.width, digitalTwinMap.height);
+            dtCtx.putImageData(imageData, 0, 0);
+
+            // Reset canvas state
+            dtCtx.setTransform(1, 0, 0, 1, 0, 0);
+            dtCtx.globalAlpha = 1.0;
+            dtCtx.globalCompositeOperation = 'source-over';
+
+            // Draw view cone - use exactly the same logic as globalView
+            dtCtx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+            dtCtx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+            dtCtx.lineWidth = 2;
+
+            const startAngle = cameraAngle - viewAngle / 2;
+            const endAngle = cameraAngle + viewAngle / 2;
+            const steps = 30; // Same as globalView
+
+            dtCtx.beginPath();
+            dtCtx.moveTo(cameraX, cameraY);
+
+            for (let i = 0; i <= steps; i++) {
+                const angle = startAngle + (endAngle - startAngle) * (i / steps);
+                const x = cameraX + Math.cos(angle) * viewDistance;
+                const y = cameraY + Math.sin(angle) * viewDistance;
+                dtCtx.lineTo(x, y);
+            }
+
+            dtCtx.closePath();
+            dtCtx.fill();
+            dtCtx.stroke();
+
+            // Draw camera position on top
+            dtCtx.fillStyle = '#2196F3';
+            dtCtx.beginPath();
+            dtCtx.arc(cameraX, cameraY, 8, 0, 2 * Math.PI);
+            dtCtx.fill();
+
+            // Draw dynamic objects (overlay) - only within current field of view
+            if (showDynamicObjects) {
+                dynamicObjects.forEach(obj => {
+                    // Check if dynamic object is within current field of view
+                    if (isInViewRange(obj.x, obj.y)) {
+                        dtCtx.fillStyle = obj.color;
+                        dtCtx.fillRect(obj.x - obj.width/2, obj.y - obj.height/2, obj.width, obj.height);
+
+                        // Draw motion trail only if in view
+                        dtCtx.strokeStyle = obj.color + '80';
+                        dtCtx.lineWidth = 2;
+                        dtCtx.beginPath();
+                        dtCtx.moveTo(obj.x, obj.y);
+                        dtCtx.lineTo(obj.x - obj.vx * 20, obj.y - obj.vy * 20);
+                        dtCtx.stroke();
+                    }
+                });
+            }
+
+            // Draw update progress indicator
+            let observedPixels = 0;
+            for (let i = 0; i < digitalTwinMap.observedMask.length; i++) {
+                if (digitalTwinMap.observedMask[i]) observedPixels++;
+            }
+            const totalPixels = digitalTwinMap.observedMask.length;
+            const percentage = ((observedPixels / totalPixels) * 100).toFixed(1);
+
+            dtCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            dtCtx.fillRect(10, 10, 200, 30);
+            dtCtx.fillStyle = '#fff';
+            dtCtx.font = '14px Arial';
+            dtCtx.fillText(`観測済み領域: ${percentage}%`, 20, 30);
+        }
+
+        // Helper functions
+        function isInViewRange(objX, objY) {
+            const dx = objX - cameraX;
+            const dy = objY - cameraY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > viewDistance) return false;
+
+            const angleToObj = Math.atan2(dy, dx);
+            let angleDiff = angleToObj - cameraAngle;
+
+            // Normalize angle difference
+            while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+            while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+            return Math.abs(angleDiff) <= viewAngle / 2;
+        }
+
+        function drawFPVView() {
+            // FPV view is removed
+        }
+
+        function drawGlobalView() {
+            globalCtx.fillStyle = '#111';
+            globalCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
+
+            // Draw camera
+            globalCtx.fillStyle = '#2196F3';
+            globalCtx.beginPath();
+            globalCtx.arc(cameraX, cameraY, 8, 0, 2 * Math.PI);
+            globalCtx.fill();
+
+            // Draw view cone
+            globalCtx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+            globalCtx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+            globalCtx.lineWidth = 2;
+            globalCtx.beginPath();
+            globalCtx.moveTo(cameraX, cameraY);
+            globalCtx.arc(cameraX, cameraY, viewDistance,
+                         cameraAngle - viewAngle/2,
+                         cameraAngle + viewAngle/2);
+            globalCtx.closePath();
+            globalCtx.fill();
+            globalCtx.stroke();
+
+            // Draw static objects
+            staticObjects.forEach(obj => {
+                const inView = isInViewRange(obj.x, obj.y);
+
+                if (inView) {
+                    obj.updated = true;
+                    obj.age = 0;
+                } else {
+                    obj.age += 0.016; // Approximate frame time
+                }
+
+                // Color based on update status
+                if (obj.updated && obj.age < 2) {
+                    globalCtx.fillStyle = '#4CAF50'; // Fresh green
+                } else {
+                    const fadeAmount = Math.min(obj.age / 5, 1);
+                    const brightness = 100 - (fadeAmount * 50);
+                    globalCtx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                }
+
+                globalCtx.fillRect(obj.x - obj.width/2, obj.y - obj.height/2, obj.width, obj.height);
+
+                // Draw update indicator for objects in view
+                if (inView) {
+                    globalCtx.strokeStyle = '#FFD700';
+                    globalCtx.lineWidth = 3;
+                    globalCtx.strokeRect(obj.x - obj.width/2 - 2, obj.y - obj.height/2 - 2,
+                                       obj.width + 4, obj.height + 4);
+                }
+            });
+
+            // Draw dynamic objects
+            if (showDynamicObjects) {
+                dynamicObjects.forEach(obj => {
+                    globalCtx.fillStyle = obj.color;
+                    globalCtx.fillRect(obj.x - obj.width/2, obj.y - obj.height/2, obj.width, obj.height);
+
+                    // Draw motion trail
+                    globalCtx.strokeStyle = obj.color + '80';
+                    globalCtx.lineWidth = 2;
+                    globalCtx.beginPath();
+                    globalCtx.moveTo(obj.x, obj.y);
+                    globalCtx.lineTo(obj.x - obj.vx * 20, obj.y - obj.vy * 20);
+                    globalCtx.stroke();
+                });
+            }
+
+            // Draw coordinate system
+            globalCtx.strokeStyle = '#666';
+            globalCtx.lineWidth = 1;
+            for (let i = 0; i < globalCanvas.width; i += 50) {
+                globalCtx.beginPath();
+                globalCtx.moveTo(i, 0);
+                globalCtx.lineTo(i, globalCanvas.height);
+                globalCtx.stroke();
+            }
+            for (let i = 0; i < globalCanvas.height; i += 50) {
+                globalCtx.beginPath();
+                globalCtx.moveTo(0, i);
+                globalCtx.lineTo(globalCanvas.width, i);
+                globalCtx.stroke();
+            }
+        }
+
+        function updateScene() {
+            time += 0.016;
+
+            // Dynamic exploration behavior
+            if (time - lastDirectionChange > 1.5 + Math.random() * 2) { // Change direction every 1.5-3.5 seconds
+
+                if (!isReturning && Math.random() < 0.7) {
+                    // 70% chance: explore new area
+                    const margin = 80;
+                    const maxWidth = (globalCanvas.width || 600);
+                    const maxHeight = (globalCanvas.height || 400);
+
+                    explorationTarget.x = margin + Math.random() * (maxWidth - 2 * margin);
+                    explorationTarget.y = margin + Math.random() * (maxHeight - 2 * margin);
+                } else {
+                    // 30% chance or return mode: go to center area
+                    const centerX = (globalCanvas.width || 600) / 2;
+                    const centerY = (globalCanvas.height || 400) / 2;
+                    explorationTarget.x = centerX + (Math.random() - 0.5) * 100;
+                    explorationTarget.y = centerY + (Math.random() - 0.5) * 100;
+                    isReturning = !isReturning;
+                }
+
+                lastDirectionChange = time;
+            }
+
+            // Move towards exploration target with some randomness
+            const dx = explorationTarget.x - cameraX;
+            const dy = explorationTarget.y - cameraY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > 20) {
+                const speed = 1.5 + Math.random() * 1; // Variable speed
+                cameraVelocityX = (dx / distance) * speed + (Math.random() - 0.5) * 0.5;
+                cameraVelocityY = (dy / distance) * speed + (Math.random() - 0.5) * 0.5;
+            } else {
+                // Near target, slow down and add some drift
+                cameraVelocityX *= 0.8;
+                cameraVelocityY *= 0.8;
+                cameraVelocityX += (Math.random() - 0.5) * 0.3;
+                cameraVelocityY += (Math.random() - 0.5) * 0.3;
+            }
+
+            // Dynamic rotation - sometimes look around, sometimes focus on movement direction
+            if (Math.random() < 0.1) { // 10% chance each frame to change rotation behavior
+                if (Math.random() < 0.6) {
+                    // Look in movement direction
+                    const targetAngle = Math.atan2(cameraVelocityY, cameraVelocityX);
+                    let angleDiff = targetAngle - cameraAngle;
+                    while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                    while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                    cameraAngularVelocity = angleDiff * 0.02;
+                } else {
+                    // Random exploration rotation
+                    cameraAngularVelocity = (Math.random() - 0.5) * 0.04;
+                }
+            }
+
+            // Update camera position
+            cameraX += cameraVelocityX;
+            cameraY += cameraVelocityY;
+            cameraAngle += cameraAngularVelocity;
+
+            // Smooth angular velocity decay
+            cameraAngularVelocity *= 0.98;
+
+            // Keep camera within bounds with bouncing
+            const margin = 60;
+            const maxWidth = (globalCanvas.width || 600);
+            const maxHeight = (globalCanvas.height || 400);
+
+            if (cameraX < margin || cameraX > maxWidth - margin) {
+                cameraVelocityX *= -0.8;
+                explorationTarget.x = maxWidth / 2; // Reset target to center area
+            }
+            if (cameraY < margin || cameraY > maxHeight - margin) {
+                cameraVelocityY *= -0.8;
+                explorationTarget.y = maxHeight / 2; // Reset target to center area
+            }
+
+            // Clamp camera position
+            cameraX = Math.max(margin, Math.min(maxWidth - margin, cameraX));
+            cameraY = Math.max(margin, Math.min(maxHeight - margin, cameraY));
+
+            // Update dynamic objects
+            dynamicObjects.forEach(obj => {
+                obj.x += obj.vx;
+                obj.y += obj.vy;
+
+                // Bounce off walls
+                if (obj.x <= obj.width/2 || obj.x >= maxWidth - obj.width/2) {
+                    obj.vx *= -1;
+                }
+                if (obj.y <= obj.height/2 || obj.y >= maxHeight - obj.height/2) {
+                    obj.vy *= -1;
+                }
+
+                // Keep in bounds
+                obj.x = Math.max(obj.width/2, Math.min(maxWidth - obj.width/2, obj.x));
+                obj.y = Math.max(obj.height/2, Math.min(maxHeight - obj.height/2, obj.y));
+            });
+        }
+
+        function animate() {
+            updateScene();
+            drawGlobalView();
+            updateDigitalTwin();
+            drawDigitalTwin();
+
+            if (isAnimating) {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                animate();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        function resetView() {
+            time = 0;
+            lastDirectionChange = 0;
+            cameraX = 300;
+            cameraY = 200;
+            cameraAngle = 0;
+            cameraVelocityX = 0;
+            cameraVelocityY = 0;
+            cameraAngularVelocity = 0;
+            explorationTarget = { x: 300, y: 200 };
+            isReturning = false;
+
+            staticObjects.forEach(obj => {
+                obj.updated = false;
+                obj.age = 5;
+            });
+
+            // Reset dynamic objects positions
+            dynamicObjects[0].x = 250;
+            dynamicObjects[0].y = 180;
+            dynamicObjects[1].x = 180;
+            dynamicObjects[1].y = 120;
+            dynamicObjects[2].x = 380;
+            dynamicObjects[2].y = 280;
+
+            // Reset digital twin
+            initializeDigitalTwin();
+
+            drawGlobalView();
+            drawDigitalTwin();
+        }
+
+        function moveRandomStaticObject() {
+            // Select a random static object
+            const randomIndex = Math.floor(Math.random() * staticObjects.length);
+            const obj = staticObjects[randomIndex];
+
+            // Generate new random position
+            const margin = 50;
+            const maxWidth = (globalCanvas.width || 600);
+            const maxHeight = (globalCanvas.height || 400);
+
+            obj.x = margin + Math.random() * (maxWidth - 2 * margin);
+            obj.y = margin + Math.random() * (maxHeight - 2 * margin);
+
+            // Reset update status for this object
+            obj.updated = false;
+            obj.age = 5;
+
+            // Redraw if not animating
+            if (!isAnimating) {
+                drawFPVView();
+                drawGlobalView();
+                drawDigitalTwin();
+            }
+        }
+
+        function toggleDynamicObjects() {
+            showDynamicObjects = !showDynamicObjects;
+            drawGlobalView();
+            drawDigitalTwin();
+        }
+
+        // Initialize
+        resizeCanvases();
+        initializeDigitalTwin();
+
+        // Initial draw
+        drawGlobalView();
+        drawDigitalTwin();
+
+        // Start animation automatically
+        setTimeout(() => {
+            toggleAnimation();
+        }, 1000);
+    </script>
+</body>
+</html>
