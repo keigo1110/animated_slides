@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -66,7 +67,7 @@
             top: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,255,255,0.1);
+            background: rgba(0, 255, 255, 0.1);
             border: 2px solid #00ffff;
             padding: 15px 30px;
             border-radius: 30px;
@@ -77,8 +78,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
-            50% { transform: translateX(-50%) scale(1.05); opacity: 1; }
+
+            0%,
+            100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.05);
+                opacity: 1;
+            }
         }
 
         .speed-display {
@@ -129,8 +139,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .scenario-controls {
@@ -145,8 +162,8 @@
 
         .scenario-btn {
             padding: 12px 25px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 25px;
             color: white;
             font-size: 1em;
@@ -156,15 +173,15 @@
         }
 
         .scenario-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-color: #00ffff;
             transform: translateY(-2px);
         }
 
         .scenario-btn.active {
-            background: rgba(0,255,255,0.2);
+            background: rgba(0, 255, 255, 0.2);
             border-color: #00ffff;
-            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
 
         .alert-indicator {
@@ -177,6 +194,7 @@
             transition: opacity 0.3s;
             text-shadow: 0 0 30px currentColor;
             pointer-events: none;
+            z-index: 10;
         }
 
         .alert-indicator.show {
@@ -185,8 +203,15 @@
         }
 
         @keyframes alertPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
         }
 
         .status-message {
@@ -194,7 +219,7 @@
             top: 180px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             padding: 10px 30px;
             border-radius: 20px;
             font-size: 1.1em;
@@ -211,7 +236,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             padding: 15px;
             border-radius: 10px;
             font-size: 0.9em;
@@ -233,8 +258,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .loading {
@@ -245,12 +277,159 @@
             font-size: 1.5em;
             color: #00ffff;
         }
+
+        .crash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.8) 0%, rgba(255, 0, 0, 0) 70%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .crash-overlay.show {
+            animation: crashFlash 2s ease-out;
+        }
+
+        @keyframes crashFlash {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        .story-text {
+            position: absolute;
+            bottom: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+            max-width: 80%;
+        }
+
+        .story-text.show {
+            opacity: 1;
+        }
+
+        .story-text.success {
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .story-text.warning {
+            border: 2px solid #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+        }
+
+        .story-text.danger {
+            border: 2px solid #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .distance-indicator {
+            position: absolute;
+            top: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2em;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .distance-indicator.show {
+            opacity: 1;
+        }
+
+        .distance-indicator.danger {
+            background: rgba(255, 0, 0, 0.3);
+            border: 2px solid #ff0000;
+        }
+
+        .comparison-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .comparison-panel.show {
+            opacity: 1;
+        }
+
+        .comparison-panel h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #00ffff;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .comparison-item {
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .comparison-item.with-system {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+        }
+
+        .comparison-item.without-system {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+        }
+
+        .comparison-item h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
     </style>
 </head>
+
 <body>
     <div id="canvas-container">
         <div class="loading" id="loading">3D環境を初期化中...</div>
     </div>
+
+    <div class="crash-overlay" id="crashOverlay"></div>
 
     <div class="ui-overlay">
         <div class="title">
@@ -264,23 +443,35 @@
 
         <div class="status-message" id="statusMessage"></div>
 
+        <div class="distance-indicator" id="distanceIndicator">
+            交差点まで: <span id="distanceValue">--</span>m
+        </div>
+
         <div class="alert-indicator" id="alertIndicator">⚠️</div>
+
+        <div class="story-text" id="storyText"></div>
+
+        <div class="comparison-panel" id="comparisonPanel">
+            <h2>システムの効果</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item with-system">
+                    <h3>✅ AIシステムあり</h3>
+                    <p>危険を事前検知<br>警告により減速<br>安全に交差点通過</p>
+                </div>
+                <div class="comparison-item without-system">
+                    <h3>❌ システムなし</h3>
+                    <p>危険に気づかず<br>高速のまま進入<br>事故発生</p>
+                </div>
+            </div>
+        </div>
 
         <div class="speed-display">
             <div class="speedometer">
                 <svg class="speed-arc" viewBox="0 0 200 100">
-                    <path id="speedArc" d="M 20 80 A 60 60 0 0 1 180 80"
-                          fill="none"
-                          stroke="#333"
-                          stroke-width="15"
-                          stroke-linecap="round"/>
-                    <path id="speedProgress" d="M 20 80 A 60 60 0 0 1 180 80"
-                          fill="none"
-                          stroke="#00ff00"
-                          stroke-width="15"
-                          stroke-linecap="round"
-                          stroke-dasharray="188.5"
-                          stroke-dashoffset="188.5"/>
+                    <path id="speedArc" d="M 20 80 A 60 60 0 0 1 180 80" fill="none" stroke="#333" stroke-width="15"
+                        stroke-linecap="round" />
+                    <path id="speedProgress" d="M 20 80 A 60 60 0 0 1 180 80" fill="none" stroke="#00ff00"
+                        stroke-width="15" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5" />
                 </svg>
                 <div class="speed-value" id="speedValue">15<span class="speed-unit">km/h</span></div>
             </div>
@@ -288,28 +479,28 @@
 
         <div class="scenario-controls">
             <button class="scenario-btn" id="btn-safe" onclick="playScenario('safe')">
-                🟢 安全走行
+                🟢 安全走行（警告なし）
             </button>
             <button class="scenario-btn" id="btn-speed" onclick="playScenario('speed')">
-                🟡 速度超過
+                🟡 危険走行（警告あり）
             </button>
             <button class="scenario-btn" id="btn-intersection" onclick="playScenario('intersection')">
-                🔴 交差点危険接近
+                🔴 危険走行（警告なし）
             </button>
         </div>
 
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color" style="background: #00ff00;"></div>
-                <span>安全（警告なし）</span>
+                <span>安全（交差点通過）</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #ffaa00;"></div>
-                <span>注意（軽警告）</span>
+                <span>警告（減速して通過）</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #ff0000;"></div>
-                <span>危険（強警告）</span>
+                <span>危険（事故発生）</span>
             </div>
         </div>
     </div>
@@ -322,6 +513,8 @@
         let warningZone, deviceLight;
         let clock = new THREE.Clock();
         let currentScenario = 'safe';
+        let car, pedestrian;
+        let crashParticles = [];
 
         // Initialize Three.js scene
         function init() {
@@ -354,6 +547,8 @@
             createRoad();
             createBike();
             createWarningSystem();
+            createTrafficElements();
+            createCrashParticles();
 
             // Remove loading message
             document.getElementById('loading').style.display = 'none';
@@ -402,7 +597,7 @@
             // Main road
             road = new THREE.Group();
 
-            const roadGeometry = new THREE.BoxGeometry(80, 0.1, 12);
+            const roadGeometry = new THREE.BoxGeometry(120, 0.1, 12);
             const roadMaterial = new THREE.MeshStandardMaterial({
                 color: 0x3a3a3a,
                 roughness: 0.8
@@ -412,7 +607,7 @@
             road.add(roadMesh);
 
             // Center line
-            const lineGeometry = new THREE.BoxGeometry(80, 0.2, 0.2);
+            const lineGeometry = new THREE.BoxGeometry(120, 0.2, 0.2);
             const lineMaterial = new THREE.MeshBasicMaterial({
                 color: 0xffff00
             });
@@ -421,8 +616,8 @@
             road.add(centerLine);
 
             // Road markings
-            for (let i = -35; i <= 35; i += 10) {
-                if (i !== 25 && i !== 35) { // Skip intersection area
+            for (let i = -55; i <= 55; i += 10) {
+                if (i < 20 || i > 40) { // Skip intersection area
                     const markGeometry = new THREE.BoxGeometry(4, 0.15, 0.1);
                     const markMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
                     const mark = new THREE.Mesh(markGeometry, markMaterial);
@@ -441,33 +636,27 @@
             intersectionMesh.receiveShadow = true;
             intersection.add(intersectionMesh);
 
-            // Intersection markings
-            const crossGeometry = new THREE.BoxGeometry(20, 0.2, 0.5);
-            const crossMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            // Cross road
+            const crossRoadGeometry = new THREE.BoxGeometry(12, 0.1, 60);
+            const crossRoad = new THREE.Mesh(crossRoadGeometry, roadMaterial);
+            crossRoad.position.y = 0.05;
+            intersection.add(crossRoad);
 
-            for (let i = -8; i <= 8; i += 4) {
-                const stripH = new THREE.Mesh(crossGeometry, crossMaterial);
-                stripH.position.set(0, 0.1, i);
-                intersection.add(stripH);
-
-                const stripV = new THREE.Mesh(crossGeometry, crossMaterial);
-                stripV.rotation.y = Math.PI / 2;
-                stripV.position.set(i, 0.1, 0);
-                intersection.add(stripV);
+            // Intersection markings (zebra crossing)
+            for (let i = -8; i <= 8; i += 2) {
+                const zebraGeometry = new THREE.BoxGeometry(12, 0.2, 1);
+                const zebraMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const zebra = new THREE.Mesh(zebraGeometry, zebraMaterial);
+                zebra.position.set(0, 0.1, i);
+                intersection.add(zebra);
             }
 
-            // Danger zone indicator (subtle)
-            const dangerRingGeometry = new THREE.RingGeometry(8, 10, 32);
-            const dangerRingMaterial = new THREE.MeshBasicMaterial({
-                color: 0xff0000,
-                transparent: true,
-                opacity: 0.1,
-                side: THREE.DoubleSide
-            });
-            const dangerRing = new THREE.Mesh(dangerRingGeometry, dangerRingMaterial);
-            dangerRing.rotation.x = -Math.PI / 2;
-            dangerRing.position.y = 0.2;
-            intersection.add(dangerRing);
+            // Stop line
+            const stopLineGeometry = new THREE.BoxGeometry(12, 0.2, 0.5);
+            const stopLineMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const stopLine = new THREE.Mesh(stopLineGeometry, stopLineMaterial);
+            stopLine.position.set(20, 0.1, 0);
+            intersection.add(stopLine);
 
             intersection.position.set(30, 0, 0);
             scene.add(intersection);
@@ -476,7 +665,7 @@
         function createBike() {
             bike = new THREE.Group();
 
-            // Bike frame (simplified but recognizable)
+            // Bike frame
             const frameGroup = new THREE.Group();
 
             // Main frame
@@ -525,7 +714,7 @@
 
             bike.add(wheelGroup);
 
-            // Rider (very simplified)
+            // Rider
             const riderGroup = new THREE.Group();
 
             const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.6, 1.5);
@@ -544,7 +733,7 @@
 
             bike.add(riderGroup);
 
-            // Smart device (glowing indicator)
+            // Smart device
             deviceLight = new THREE.PointLight(0x00ff00, 0, 3);
             deviceLight.position.set(0.5, 2, 0.5);
             bike.add(deviceLight);
@@ -560,14 +749,70 @@
             bike.add(device);
             bike.device = device;
 
-            bike.position.set(-35, 0, 0);
+            bike.position.set(-55, 0, 0);
             bike.castShadow = true;
             scene.add(bike);
         }
 
+        function createTrafficElements() {
+            // Car
+            car = new THREE.Group();
+
+            const carBody = new THREE.BoxGeometry(4, 1.5, 2);
+            const carMaterial = new THREE.MeshStandardMaterial({
+                color: 0xcc0000,
+                metalness: 0.6,
+                roughness: 0.4
+            });
+            const carMesh = new THREE.Mesh(carBody, carMaterial);
+            carMesh.position.y = 0.75;
+            car.add(carMesh);
+
+            // Car roof
+            const roofGeometry = new THREE.BoxGeometry(2.5, 0.8, 1.8);
+            const roof = new THREE.Mesh(roofGeometry, carMaterial);
+            roof.position.y = 1.8;
+            car.add(roof);
+
+            // Wheels
+            const carWheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3);
+            const carWheelMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+
+            for (let x of [-1.5, 1.5]) {
+                for (let z of [-0.8, 0.8]) {
+                    const wheel = new THREE.Mesh(carWheelGeometry, carWheelMaterial);
+                    wheel.rotation.z = Math.PI / 2;
+                    wheel.position.set(x, 0.4, z);
+                    car.add(wheel);
+                }
+            }
+
+            car.position.set(30, 0, -25);
+            car.visible = false;
+            scene.add(car);
+
+            // Pedestrian
+            pedestrian = new THREE.Group();
+
+            const pedBodyGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1.5);
+            const pedMaterial = new THREE.MeshStandardMaterial({ color: 0x228822 });
+            const pedBody = new THREE.Mesh(pedBodyGeometry, pedMaterial);
+            pedBody.position.y = 0.75;
+            pedestrian.add(pedBody);
+
+            const pedHeadGeometry = new THREE.SphereGeometry(0.3);
+            const pedHead = new THREE.Mesh(pedHeadGeometry, pedMaterial);
+            pedHead.position.y = 1.8;
+            pedestrian.add(pedHead);
+
+            pedestrian.position.set(25, 0, 8);
+            pedestrian.visible = false;
+            scene.add(pedestrian);
+        }
+
         function createWarningSystem() {
-            // Warning zone (invisible by default)
-            const zoneGeometry = new THREE.CylinderGeometry(12, 12, 0.5, 32);
+            // Warning zone
+            const zoneGeometry = new THREE.CylinderGeometry(15, 15, 0.5, 32);
             const zoneMaterial = new THREE.MeshBasicMaterial({
                 color: 0xff0000,
                 transparent: true,
@@ -577,7 +822,7 @@
             warningZone.position.set(30, 0.3, 0);
             scene.add(warningZone);
 
-            // Alert waves for device
+            // Alert waves
             bike.alertWaves = [];
             for (let i = 0; i < 3; i++) {
                 const waveGeometry = new THREE.RingGeometry(1 + i * 0.5, 1.5 + i * 0.5, 32);
@@ -595,6 +840,74 @@
             }
         }
 
+        function createCrashParticles() {
+            const particleGeometry = new THREE.SphereGeometry(0.2);
+
+            for (let i = 0; i < 20; i++) {
+                const particleMaterial = new THREE.MeshBasicMaterial({
+                    color: Math.random() > 0.5 ? 0xff0000 : 0xffaa00,
+                    transparent: true,
+                    opacity: 0
+                });
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                particle.visible = false;
+                particle.velocity = new THREE.Vector3();
+                crashParticles.push(particle);
+                scene.add(particle);
+            }
+        }
+
+        function showCrashEffect() {
+            const crashOverlay = document.getElementById('crashOverlay');
+            crashOverlay.classList.add('show');
+
+            // Particle explosion
+            crashParticles.forEach((particle, i) => {
+                particle.position.copy(bike.position);
+                particle.position.y = 2;
+                particle.visible = true;
+                particle.material.opacity = 1;
+
+                const angle = (i / crashParticles.length) * Math.PI * 2;
+                particle.velocity.set(
+                    Math.cos(angle) * 0.5,
+                    Math.random() * 0.5 + 0.3,
+                    Math.sin(angle) * 0.5
+                );
+            });
+
+            // Camera shake
+            const originalCamPos = camera.position.clone();
+            let shakeTime = 0;
+
+            function shake() {
+                shakeTime += 0.1;
+                if (shakeTime < 1) {
+                    camera.position.x = originalCamPos.x + (Math.random() - 0.5) * 2;
+                    camera.position.y = originalCamPos.y + (Math.random() - 0.5) * 2;
+                    camera.position.z = originalCamPos.z + (Math.random() - 0.5) * 2;
+                    requestAnimationFrame(shake);
+                } else {
+                    camera.position.copy(originalCamPos);
+                }
+            }
+            shake();
+        }
+
+        function updateCrashParticles() {
+            crashParticles.forEach(particle => {
+                if (particle.visible) {
+                    particle.position.add(particle.velocity);
+                    particle.velocity.y -= 0.02; // Gravity
+                    particle.material.opacity -= 0.02;
+
+                    if (particle.material.opacity <= 0) {
+                        particle.visible = false;
+                    }
+                }
+            });
+        }
+
         function updateSpeedometer(speed, status = 'safe') {
             const speedValue = document.getElementById('speedValue');
             const speedProgress = document.getElementById('speedProgress');
@@ -602,13 +915,11 @@
             speedValue.innerHTML = `${Math.round(speed)}<span class="speed-unit">km/h</span>`;
             speedValue.className = 'speed-value';
 
-            // Update arc
             const maxSpeed = 40;
             const percentage = Math.min(speed / maxSpeed, 1);
             const dashOffset = 188.5 * (1 - percentage);
             speedProgress.style.strokeDashoffset = dashOffset;
 
-            // Update colors
             if (status === 'danger') {
                 speedValue.classList.add('danger');
                 speedProgress.style.stroke = '#ff0000';
@@ -620,14 +931,58 @@
             }
         }
 
+        function updateDistance(show, distance, danger = false) {
+            const distanceIndicator = document.getElementById('distanceIndicator');
+            const distanceValue = document.getElementById('distanceValue');
+
+            if (show) {
+                distanceIndicator.classList.add('show');
+                if (danger) {
+                    distanceIndicator.classList.add('danger');
+                } else {
+                    distanceIndicator.classList.remove('danger');
+                }
+                distanceValue.textContent = Math.round(distance);
+            } else {
+                distanceIndicator.classList.remove('show');
+            }
+        }
+
         function showStatusMessage(message, duration = 3000) {
             const statusMessage = document.getElementById('statusMessage');
             statusMessage.textContent = message;
             statusMessage.classList.add('show');
 
-            setTimeout(() => {
-                statusMessage.classList.remove('show');
-            }, duration);
+            if (duration > 0) {
+                setTimeout(() => {
+                    statusMessage.classList.remove('show');
+                }, duration);
+            }
+        }
+
+        function showStoryText(text, type = '', duration = 3000) {
+            const storyText = document.getElementById('storyText');
+            storyText.textContent = text;
+            storyText.className = 'story-text show';
+
+            if (type) {
+                storyText.classList.add(type);
+            }
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    storyText.classList.remove('show');
+                }, duration);
+            }
+        }
+
+        function showComparisonPanel(show) {
+            const panel = document.getElementById('comparisonPanel');
+            if (show) {
+                panel.classList.add('show');
+            } else {
+                panel.classList.remove('show');
+            }
         }
 
         function showAlert(show) {
@@ -641,16 +996,13 @@
 
         function animateWarning(active) {
             if (active) {
-                // Device turns red
                 bike.device.material.emissive = new THREE.Color(0xff0000);
                 bike.device.material.emissiveIntensity = 0.8;
                 deviceLight.color.setHex(0xff0000);
                 deviceLight.intensity = 2;
 
-                // Show alert
                 showAlert(true);
 
-                // Animate warning waves
                 bike.alertWaves.forEach((wave, index) => {
                     wave.visible = true;
                     const delay = index * 200;
@@ -659,16 +1011,13 @@
                     }, delay);
                 });
             } else {
-                // Device turns green
                 bike.device.material.emissive = new THREE.Color(0x00ff00);
                 bike.device.material.emissiveIntensity = 0.5;
                 deviceLight.color.setHex(0x00ff00);
                 deviceLight.intensity = 0;
 
-                // Hide alert
                 showAlert(false);
 
-                // Hide waves
                 bike.alertWaves.forEach(wave => {
                     wave.visible = false;
                     wave.material.opacity = 0;
@@ -693,8 +1042,8 @@
                 } else {
                     wave.material.opacity = 0;
                     wave.scale.set(1, 1, 1);
-                    if (currentScenario !== 'safe') {
-                        animateWave(wave); // Loop if still in danger
+                    if (currentScenario === 'speed') {
+                        animateWave(wave);
                     }
                 }
             }
@@ -716,15 +1065,25 @@
 
             currentScenario = scenario;
 
-            // Reset bike position
-            bike.position.x = -35;
-            bike.rotation.y = 0;
+            // Reset everything
+            bike.position.set(-55, 0, 0);
+            bike.rotation.set(0, 0, 0);
+            car.visible = false;
+            car.position.set(30, 0, -25);
+            pedestrian.visible = false;
+            pedestrian.position.set(25, 0, 8);
+
+            // Hide crash overlay
+            document.getElementById('crashOverlay').classList.remove('show');
+            crashParticles.forEach(p => p.visible = false);
 
             // Reset warning systems
             animateWarning(false);
             warningZone.material.opacity = 0;
+            updateDistance(false);
+            showComparisonPanel(false);
 
-            switch(scenario) {
+            switch (scenario) {
                 case 'safe':
                     animateSafeScenario();
                     break;
@@ -739,32 +1098,55 @@
 
         function animateSafeScenario() {
             showStatusMessage('✅ 安全な速度で走行中 - システムは静かに監視');
+            showStoryText('警告なし：快適で静かな走行体験', 'success', 4000);
             let startTime = Date.now();
 
             function update() {
                 const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / 8000, 1);
+                const progress = Math.min(elapsed / 12000, 1);
 
                 // Move bike smoothly
-                bike.position.x = -35 + progress * 60;
+                bike.position.x = -55 + progress * 120;
 
-                // Rotate wheels
-                const wheelRotation = progress * Math.PI * 10;
+                // Distance indicator
+                const distanceToIntersection = Math.max(0, 30 - bike.position.x);
+                if (distanceToIntersection < 50 && distanceToIntersection > 0) {
+                    updateDistance(true, distanceToIntersection);
+                } else if (bike.position.x > 40) {
+                    updateDistance(false);
+                }
+
+                // Wheels
+                const wheelRotation = progress * Math.PI * 20;
                 bike.frontWheel.rotation.z = wheelRotation;
                 bike.rearWheel.rotation.z = wheelRotation;
 
-                // Update speed
-                updateSpeedometer(15 + Math.sin(progress * Math.PI * 2) * 3, 'safe');
+                // Speed
+                updateSpeedometer(18 + Math.sin(progress * Math.PI * 2) * 3, 'safe');
 
-                // Camera follow
-                camera.position.x = bike.position.x * 0.5;
-                camera.lookAt(bike.position);
+                // Camera
+                if (bike.position.x < 10) {
+                    camera.position.set(bike.position.x * 0.5, 25, 40);
+                    camera.lookAt(bike.position);
+                } else if (bike.position.x < 50) {
+                    camera.position.set(15, 30, 45);
+                    camera.lookAt(intersection.position);
+                } else {
+                    camera.position.set(bike.position.x * 0.4, 25, 40);
+                    camera.lookAt(bike.position);
+                }
+
+                // Messages
+                if (Math.abs(bike.position.x - 30) < 2 && !bike.messageShown) {
+                    bike.messageShown = true;
+                    showStoryText('✅ 交差点を安全に通過', 'success', 2000);
+                }
 
                 if (progress < 1) {
                     animationId = requestAnimationFrame(update);
                 } else {
-                    // Loop
-                    playScenario('safe');
+                    bike.messageShown = false;
+                    setTimeout(() => playScenario('safe'), 1000);
                 }
             }
 
@@ -772,51 +1154,135 @@
         }
 
         function animateSpeedScenario() {
-            showStatusMessage('⚠️ 速度超過を検知 - 注意喚起の警告音');
+            showStatusMessage('⚠️ 危険走行を検知 - AIが事前警告を発動');
+            showStoryText('AIシステムあり：警告により事故を防止', 'warning', 4000);
             let startTime = Date.now();
             let warningTriggered = false;
+            let warningEnded = false;
+            let speedReduced = false;
+            let safeSpeedAchieved = false;
+
+            // Show traffic
+            car.visible = true;
+            pedestrian.visible = true;
 
             function update() {
                 const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / 8000, 1);
+                const progress = Math.min(elapsed / 18000, 1); // 少し長めの時間設定
 
-                // Move bike
-                bike.position.x = -35 + progress * 60;
-
-                // Rotate wheels faster
-                const wheelRotation = progress * Math.PI * 20;
-                bike.frontWheel.rotation.z = wheelRotation;
-                bike.rearWheel.rotation.z = wheelRotation;
-
-                // Speed changes
-                let speed;
-                if (progress < 0.3) {
-                    speed = 15 + progress * 100;
-                } else if (progress < 0.7) {
-                    speed = 35;
-                    if (!warningTriggered) {
-                        warningTriggered = true;
-                        animateWarning(true);
-                        showStatusMessage('🔊 警告音発生中 - 速度を落としてください');
-                    }
-                } else {
-                    speed = 35 - (progress - 0.7) * 50;
-                    if (speed < 25 && warningTriggered) {
-                        animateWarning(false);
-                        showStatusMessage('✅ 速度が安全範囲に戻りました');
-                    }
+                // より滑らかな移動計算（easeInOutQuad関数を使用）
+                function easeInOutQuad(t) {
+                    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
                 }
 
-                updateSpeedometer(speed, speed > 25 ? 'warning' : 'safe');
+                // 総移動距離: -55から55まで（110ユニット）
+                const totalDistance = 110;
+                const smoothProgress = easeInOutQuad(progress);
+                bike.position.x = -55 + smoothProgress * totalDistance;
 
-                // Camera
-                camera.position.x = bike.position.x * 0.5;
-                camera.position.z = 40 + Math.sin(elapsed * 0.002) * 5;
-                camera.lookAt(bike.position);
+                // 距離計算
+                const distanceToIntersection = Math.max(0, 30 - bike.position.x);
+
+                // 距離表示（交差点前60mから）
+                if (distanceToIntersection < 60 && distanceToIntersection > 0) {
+                    updateDistance(true, distanceToIntersection, distanceToIntersection < 30 && !speedReduced);
+                } else if (bike.position.x > 40) {
+                    updateDistance(false);
+                }
+
+                // 交通量のアニメーション
+                if (progress > 0.25 && progress < 0.75) {
+                    const trafficProgress = (progress - 0.25) / 0.5;
+                    car.position.z = -25 + trafficProgress * 35;
+                    pedestrian.position.x = 25 + trafficProgress * 10;
+                }
+
+                // 滑らかな速度変化計算
+                let displaySpeed;
+                if (progress < 0.3) {
+                    // 高速アプローチ段階
+                    displaySpeed = 35;
+                } else if (progress < 0.6) {
+                    // 減速段階（滑らかな減速カーブ）
+                    const decelerationProgress = (progress - 0.3) / 0.3;
+                    const smoothDeceleration = 1 - Math.pow(decelerationProgress, 2);
+                    displaySpeed = 15 + (35 - 15) * smoothDeceleration;
+                } else {
+                    // 安全速度維持段階
+                    displaySpeed = 15;
+                }
+
+                // 警告音の制御（50m地点で開始、20m地点で終了）
+                if (distanceToIntersection <= 50 && distanceToIntersection > 20 && !warningTriggered) {
+                    warningTriggered = true;
+                    animateWarning(true);
+                    warningZone.material.opacity = 0.2;
+                    warningZone.material.color.setHex(0xffaa00);
+                    showStatusMessage('🔊 危険検知！交差点まで50m - 警告音発動');
+                    showStoryText('⚠️ AI事前介入：早期警告で減速を促す', 'warning', 3000);
+                }
+
+                // 警告音の終了（交差点20m手前で警告終了）
+                if (distanceToIntersection <= 20 && warningTriggered && !warningEnded) {
+                    warningEnded = true;
+                    animateWarning(false);
+                    warningZone.material.opacity = 0;
+                    showStatusMessage('✅ 減速完了 - 警告音停止');
+                    showStoryText('👍 安全速度達成 - 交差点に安全進入', 'success', 3000);
+                }
+
+                // 速度低下確認
+                if (displaySpeed < 20 && warningTriggered && !speedReduced) {
+                    speedReduced = true;
+                    showStatusMessage('✅ 安全速度まで減速完了');
+                }
+
+                // 交差点進入確認
+                if (distanceToIntersection < 5 && speedReduced && !safeSpeedAchieved) {
+                    safeSpeedAchieved = true;
+                    showStoryText('✅ 安全速度で交差点進入', 'success', 2000);
+                }
+
+                // スピードメーターの更新
+                updateSpeedometer(displaySpeed,
+                    displaySpeed > 30 ? 'danger' :
+                        displaySpeed > 20 ? 'warning' : 'safe'
+                );
+
+                // ホイールの回転（速度に基づく）
+                const wheelSpeed = displaySpeed / 15;
+                bike.frontWheel.rotation.z += wheelSpeed * 0.08;
+                bike.rearWheel.rotation.z += wheelSpeed * 0.08;
+
+                // ダイナミックカメラ
+                if (distanceToIntersection < 60 && distanceToIntersection > 5) {
+                    // 減速フェーズに焦点
+                    camera.position.set(bike.position.x + 15, 30, 45);
+                    camera.lookAt(new THREE.Vector3(bike.position.x + 10, 0, 0));
+                } else if (bike.position.x > 20 && bike.position.x < 40) {
+                    // 交差点通過視点
+                    camera.position.set(25, 25, 40);
+                    camera.lookAt(intersection.position);
+                } else {
+                    // フォローカメラ
+                    camera.position.set(bike.position.x * 0.4, 25, 40);
+                    camera.lookAt(bike.position);
+                }
+
+                // 交差点通過完了メッセージ
+                if (bike.position.x > 40 && safeSpeedAchieved && !bike.passedSafely) {
+                    bike.passedSafely = true;
+                    showStoryText('✅ 交差点を安全に通過完了', 'success', 2000);
+                    setTimeout(() => {
+                        showStatusMessage('💡 AIの事前警告により事故を防止しました');
+                    }, 1000);
+                }
 
                 if (progress < 1) {
                     animationId = requestAnimationFrame(update);
                 } else {
+                    // リセット
+                    bike.passedSafely = false;
                     animateWarning(false);
                     setTimeout(() => playScenario('speed'), 1000);
                 }
@@ -826,86 +1292,94 @@
         }
 
         function animateIntersectionScenario() {
-            showStatusMessage('🚨 交差点に高速で接近 - 強い警告音');
+            showStatusMessage('❌ 警告システムなし - 危険な結果に');
+            showStoryText('システムなし：事故は防げません', 'danger', 4000);
             let startTime = Date.now();
-            let warningTriggered = false;
+            let crashed = false;
+
+            // Show traffic
+            car.visible = true;
+            pedestrian.visible = true;
 
             function update() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / 10000, 1);
 
-                // Move bike toward intersection
-                bike.position.x = -35 + progress * 55;
-
-                // Calculate distance to intersection
-                const distanceToIntersection = Math.abs(bike.position.x - 30);
-
-                // Speed based on scenario
-                let speed;
-                if (progress < 0.5) {
-                    speed = 30;
-                } else if (progress < 0.8) {
-                    speed = 30 - (progress - 0.5) * 60;
-                } else {
-                    speed = 12;
+                // Fast approach to intersection
+                if (!crashed) {
+                    bike.position.x = -55 + progress * 400;
                 }
 
-                // Trigger warning when approaching intersection at high speed
-                if (distanceToIntersection < 20 && speed > 20 && !warningTriggered) {
-                    warningTriggered = true;
-                    animateWarning(true);
-                    showStatusMessage('💥 危険検知！交差点での高速接近');
+                // Distance
+                const distanceToIntersection = Math.max(0, 30 - bike.position.x);
+                if (distanceToIntersection < 60 && distanceToIntersection > 0) {
+                    updateDistance(true, distanceToIntersection, true);
+                }
 
-                    // Show danger zone
-                    warningZone.material.opacity = 0.3;
+                // Traffic movement
+                if (progress > 0.15) {
+                    const trafficProgress = (progress - 0.15) / 0.4;
+                    car.position.z = -25 + Math.min(trafficProgress * 30, 25);
+                    pedestrian.position.x = 25 + Math.min(trafficProgress * 8, 5);
+                }
+
+                // Crash detection
+                if (bike.position.x >= 28 && !crashed) {
+                    crashed = true;
+                    showCrashEffect();
+
+                    // Stop bike
+                    bike.rotation.z = 0.3;
+                    bike.position.y = 0.5;
+
+                    // Warning zone shows danger
+                    warningZone.material.opacity = 0.5;
                     warningZone.material.color.setHex(0xff0000);
+
+                    showStatusMessage('💥 衝突！警告がなかったため事故発生', 0);
+                    showStoryText('❌ 事故発生 - システムがあれば防げた事故', 'danger', 0);
+
+                    // Show comparison after delay
+                    setTimeout(() => {
+                        showComparisonPanel(true);
+                    }, 2000);
                 }
 
-                // Clear warning when speed is safe
-                if (speed < 15 && warningTriggered) {
-                    animateWarning(false);
-                    warningZone.material.opacity = 0;
-                    showStatusMessage('✅ 安全な速度で交差点通過');
+                // Speed
+                updateSpeedometer(crashed ? 0 : 35, 'danger');
+
+                // Wheels (stop if crashed)
+                if (!crashed) {
+                    const wheelRotation = progress * Math.PI * 30;
+                    bike.frontWheel.rotation.z = wheelRotation;
+                    bike.rearWheel.rotation.z = wheelRotation;
                 }
 
-                // Rotate wheels
-                const wheelRotation = progress * Math.PI * 15;
-                bike.frontWheel.rotation.z = wheelRotation;
-                bike.rearWheel.rotation.z = wheelRotation;
-
-                // Update speedometer
-                updateSpeedometer(speed, speed > 20 && distanceToIntersection < 20 ? 'danger' : 'safe');
-
-                // Dynamic camera
-                if (distanceToIntersection < 15) {
-                    // Dramatic angle when near intersection
-                    camera.position.set(
-                        bike.position.x + 10,
-                        20,
-                        30
-                    );
+                // Camera
+                if (crashed) {
+                    camera.position.set(35, 25, 35);
+                    camera.lookAt(bike.position);
+                } else if (distanceToIntersection < 40) {
+                    camera.position.set(25, 30, 45);
                     camera.lookAt(intersection.position);
                 } else {
-                    // Follow camera
-                    camera.position.x = bike.position.x * 0.5;
-                    camera.position.y = 25;
-                    camera.position.z = 40;
+                    camera.position.set(bike.position.x * 0.5, 25, 40);
                     camera.lookAt(bike.position);
                 }
 
-                // Animate warning zone
-                if (warningZone.material.opacity > 0) {
-                    warningZone.rotation.y += 0.01;
-                    const pulse = 0.3 + Math.sin(elapsed * 0.005) * 0.1;
-                    warningZone.material.opacity = pulse;
-                }
+                // Update crash particles
+                updateCrashParticles();
 
                 if (progress < 1) {
                     animationId = requestAnimationFrame(update);
                 } else {
-                    animateWarning(false);
-                    warningZone.material.opacity = 0;
-                    setTimeout(() => playScenario('intersection'), 1000);
+                    // Reset after showing the result
+                    setTimeout(() => {
+                        showComparisonPanel(false);
+                        showStoryText('', '', 0);
+                        showStatusMessage('', 0);
+                        playScenario('intersection');
+                    }, 5000);
                 }
             }
 
@@ -915,10 +1389,15 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            // Subtle device glow
+            // Device glow
             if (bike.device && currentScenario === 'safe') {
                 const intensity = 0.5 + Math.sin(Date.now() * 0.002) * 0.1;
                 bike.device.material.emissiveIntensity = intensity;
+            }
+
+            // Warning zone animation
+            if (warningZone.material.opacity > 0) {
+                warningZone.rotation.y += 0.01;
             }
 
             renderer.render(scene, camera);
@@ -940,4 +1419,5 @@
         }, 500);
     </script>
 </body>
+
 </html>
